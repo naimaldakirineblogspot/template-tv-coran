@@ -1,13 +1,23 @@
-/* style.css - Design et Animations */
+/* style.css */
 @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;700&display=swap');
 
 .font-amiri { font-family: 'Amiri', serif; }
 .font-cairo { font-family: 'Cairo', sans-serif; }
 
+.text-glow { 
+    text-shadow: 0 0 20px rgba(212, 175, 55, 0.4), 0 4px 10px rgba(0,0,0,0.8); 
+}
+
 @keyframes float { 
     0% { transform: translateY(0px) scale(1); opacity: 0; } 
-    20% { opacity: 0.5; } 80% { opacity: 0.5; } 
     100% { transform: translateY(-100px) scale(1.5); opacity: 0; } 
+}
+
+.particle { 
+    position: absolute; 
+    background: radial-gradient(circle, rgba(212,175,55,0.8) 0%, rgba(212,175,55,0) 70%); 
+    border-radius: 50%; 
+    animation: float 15s infinite linear; 
 }
 
 @keyframes tickerAnim { 
@@ -18,17 +28,6 @@
 .animate-ticker { 
     display: inline-flex; 
     animation: tickerAnim 60s linear infinite; 
-}
-
-.particle { 
-    position: absolute; 
-    background: radial-gradient(circle, rgba(212,175,55,0.8) 0%, rgba(212,175,55,0) 70%); 
-    border-radius: 50%; 
-    animation: float 15s infinite linear; 
-}
-
-.text-glow { 
-    text-shadow: 0 0 20px rgba(212, 175, 55, 0.4), 0 4px 10px rgba(0,0,0,0.8); 
 }
 
 .bg-islamic-pattern { 
