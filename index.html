@@ -6,45 +6,40 @@
     <title>نعيم الذاكرين</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="style.css">
-
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-black text-white">
+<body>
     <div id="root"></div>
 
     <script src="data.js"></script>
 
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
+        
+        // Extraction des données chargées depuis data.js
         const { UI_DICT, RECITERS, PRAYER_CITIES, PRAYER_COUNTRIES, DAILY_AYAHS_REF, DAILY_DUAS, SURAH_VIRTUES } = window.NaimData;
 
-        // --- COMPOSANTS DE L'APPLICATION ---
-        // (Ici vous collez la logique de DashboardView, QuranTVView et App que vous avez créée)
-        // Note: Assurez-vous d'utiliser les variables ci-dessus (ex: RECITERS au lieu de RECITERS_LIST)
+        // --- COMPOSANTS ---
+        const DashboardView = ({ uiLang, t }) => { /* Votre code DashboardView ici */ };
+        const QuranTVView = ({ uiLang, t }) => { /* Votre code QuranTVView ici */ };
 
-        const App = () => {
+        function App() {
             const [uiLang, setUiLang] = useState('ar');
             const [currentView, setCurrentView] = useState('home');
             const t = UI_DICT[uiLang];
 
             return (
-                <div className="min-h-screen flex flex-col" dir={uiLang === 'ar' ? 'rtl' : 'ltr'}>
-                    <nav className="p-4 bg-[#022c22] flex justify-between items-center border-b border-[#D4AF37]/30">
-                        <h1 className="text-[#D4AF37] font-amiri text-2xl">{t.appTitle}</h1>
-                        <div className="flex gap-4 font-cairo">
-                            <button onClick={() => setCurrentView('home')}>{t.home}</button>
-                            <button onClick={() => setCurrentView('tv')}>{t.quranPlayer}</button>
-                        </div>
-                    </nav>
-                    <main className="flex-1 p-4">
-                        {currentView === 'home' ? <div className="text-center mt-20 text-2xl">{t.loading}</div> : <div className="text-center mt-20 text-2xl">TV Coranique</div>}
-                    </main>
+                <div className="min-h-screen bg-black text-white" dir={uiLang === 'ar' ? 'rtl' : 'ltr'}>
+                    {/* Votre structure de navigation et contenu ici */}
+                    {currentView === 'home' && <DashboardView uiLang={uiLang} t={t} />}
+                    {currentView === 'tv' && <QuranTVView uiLang={uiLang} t={t} />}
                 </div>
             );
-        };
+        }
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
