@@ -1,31 +1,29 @@
 // data.js
-window.NaimData = {
-    UI_DICT: {
-        ar: { appTitle: "نعيم الذاكرين", /* ... le reste de vos traductions ... */ },
-        fr: { appTitle: "Naimaldakirine", /* ... */ },
-        en: { appTitle: "Naeim Al-Thakireen", /* ... */ }
+export const UI_DICT = {
+    ar: {
+        appTitle: "نعيم الذاكرين",
+        home: "الرئيسية",
+        quranPlayer: "القرآن الكريم (بث حي)",
+        prayerTimes: "مواقيت الصلاة",
+        // ... (copiez tout le contenu de UI_DICT ici)
     },
-    RECITERS: [
-        { id: "ar.alafasy", name: "مشاري راشد العفاسي" },
-        { id: "ar.mahermuaiqly", name: "ماهر المعيقلي" },
-        // ... votre liste complète
-    ],
-    PRAYER_COUNTRIES: [
-        { id: "Algeria", nameAr: "الجزائر", nameFr: "Algérie", nameEn: "Algeria" },
-        // ...
-    ],
-    PRAYER_CITIES: {
-        "Algeria": ["أدرار", "الشلف", "الأغواط", /* ... */],
-        // ...
-    },
-    DAILY_AYAHS_REF: ["2:255", "2:286", "3:8", "24:35", "112:1"],
-    DAILY_DUAS: [
-        "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً...",
-        "اللَّهُمَّ يَامُقَلِّبَ الْقُلُوبِ ثَبِّتْ قَلْبِي عَلَى دِينِكَ."
-    ],
-    SURAH_VIRTUES: {
-        1: "أعظم سورة في القرآن...",
-        18: "نور ما بين الجمعتين.",
-        67: "المانعة من عذاب القبر."
-    }
+    fr: { /* ... */ },
+    en: { /* ... */ }
 };
+
+export const PRAYER_COUNTRIES = [
+    { id: "Algeria", nameAr: "الجزائر", nameFr: "Algérie", nameEn: "Algeria" },
+    // ...
+];
+
+export const PRAYER_CITIES = {
+    "Algeria": ["أدرار", "الشلف", "الأغواط", "أم البواقي", "باتنة", "بجاية", "بسكرة", "بشار", "البليدة", "البويرة", "تمنراست", "تبسة", "تلمسان", "تيارت", "تيزي وزو", "الجزائر", "الجلفة", "جيجل", "سطيف", "سعيدة", "سكيكدة", "سيدي بلعباس", "عنابة", "قالمة", "قسنطينة", "المدية", "مستغانم", "المسيلة", "معسكر", "ورقلة", "وهران", "البيض", "إليزي", "برج بوعريريج", "بومرداس", "الطارف", "تندوف", "تيسمسيلت", "الوادي", "خنشلة", "سوق أهراس", "تيبازة", "ميلة", "عين الدفلى", "النعامة", "عين تموشنت", "غرداية", "غليزان", "تيميمون"],
+    // ...
+};
+
+export const RECITERS = [
+    { id: "ar.alafasy", name: "مشاري راشد العفاسي", nameFr: "Mishari Alafasy" },
+    // ...
+];
+
+// Exportez toutes les autres constantes (DAILY_AYAHS_REF, DAILY_DUAS, TRANSLATIONS, etc.)
