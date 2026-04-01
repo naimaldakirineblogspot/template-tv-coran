@@ -1,28 +1,174 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نعيم الذاكرين</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://votre-pseudo.github.io/votre-repo/style.css">
-</head>
-<body>
-    <div id="root"></div>
+
+    <link rel="stylesheet" href="./style.css">
 
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-    <script src="https://votre-pseudo.github.io/votre-repo/data.js"></script>
+    <script>
+        window.exports = window;
+    </script>
+</head>
+<body class="bg-black text-white selection:bg-[#D4AF37]">
+
+    <div id="root"></div>
+
+    <script src="./data.js"></script>
 
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        // Importation simulée des constantes de data.js
-        // (Si vous utilisez GitHub Pages, assurez-vous que data.js est chargé avant)
+        // دالة تحويل الأرقام للأرقام العربية
+        const toArabicNumerals = (num) => {
+            const arabicNumerals = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+            return num ? num.toString().replace(/[0-9]/g, w => arabicNumerals[w]) : '';
+        };
+
+        // --- المكونات الداخلية ---
+        
+        const DashboardView = ({ uiLang, t }) => {
+            const [prayerTimes, setPrayerTimes] = useState(null);
+            const [ayahOfDay, setAyahOfDay] = useState(null);
+
+            useEffect(() => {
+                fetch(`https://api.aladhan.com/v1/timingsByAddress?address=Tizi Ouzou,Algeria&method=3`)
+                    .then(res => res.json())
+                    .then(data => { if(data?.data) setPrayerTimes(data.data.timings); });
+            }, []);
+
+            useEffect(() => {
+                const day = new Date().getDate();
+                const ref = DAILY_AYAHS_REF[(day - 1) % DAILY_AYAHS_REF.length];
+                fetch(`https://api.alquran.cloud/v1/ayah/${ref}/editions/quran-uthmani,ar.saadi`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if(data?.code === 200) {
+                            setAyahOfDay({
+                                textAr: data.data[0].text,
+                                surahName: data.data[0].surah.name,
+                                ayahNumber: data.data[0].numberInSurah,
+                                tafsir: data.data[1].text
+                            });
+                        }
+                    });
+            }, []);
+
+            return (
+                <div className="flex flex-col gap-6 animate-verse">
+                    <div className="bg-black/50 border border-[#D4AF37]/30 p-6 rounded-3xl text-center shadow-lg">
+                        <h2 className="text-2xl font-amiri text-[#D4AF37] mb-4">{t.prayerTimes}</h2>
+                        <div className="grid grid-cols-2 md:grid-cols-6 gap-2">
+                            {prayerTimes && Object.entries({Fajr:"الفجر", Sunrise:"الشروق", Dhuhr:"الظهر", Asr:"العصر", Maghrib:"المغرب", Isha:"العشاء"}).map(([k,v]) => (
+                                <div key={k} className="bg-emerald-900/20 p-3 rounded-xl border border-[#D4AF37]/10">
+                                    <div className="text-xs text-emerald-200">{v}</div>
+                                    <div className="text-lg font-bold">{prayerTimes[k]}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    {ayahOfDay && (
+                        <div className="bg-black/50 border border-[#D4AF37]/30 p-8 rounded-3xl text-center shadow-xl">
+                            <h2 className="text-[#D4AF37] font-amiri text-xl mb-4">{t.ayahOfDay}</h2>
+                            <p className="font-amiri text-3xl leading-relaxed">{ayahOfDay.textAr} <span className="text-[#D4AF37]">﴿{toArabicNumerals(ayahOfDay.ayahNumber)}﴾</span></p>
+                            <p className="mt-4 text-emerald-100/60 text-sm">سورة {ayahOfDay.surahName}</p>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const QuranTVView = ({ uiLang, t }) => {
+            const [surahs, setSurahs] = useState([]);
+            const [selectedSurah, setSelectedSurah] = useState(1);
+            const [selectedReciter, setSelectedReciter] = useState(RECITERS[0].id);
+            const [activeVerse, setActiveVerse] = useState(null);
+            const [isPlaying, setIsPlaying] = useState(false);
+            const audioRef = useRef(null);
+
+            useEffect(() => {
+                fetch('https://api.alquran.cloud/v1/surah').then(res => res.json()).then(data => setSurahs(data.data));
+            }, []);
+
+            useEffect(() => {
+                fetch(`https://api.alquran.cloud/v1/surah/${selectedSurah}/${selectedReciter}`)
+                    .then(res => res.json())
+                    .then(data => { if(data.code === 200) setActiveVerse(data.data.ayahs[0]); });
+            }, [selectedSurah, selectedReciter]);
+
+            const toggle = () => {
+                if(isPlaying) audioRef.current.pause(); else audioRef.current.play();
+                setIsPlaying(!isPlaying);
+            };
+
+            return (
+                <div className="flex flex-col gap-6">
+                    <div className="flex flex-wrap gap-4 justify-center bg-emerald-900/20 p-4 rounded-2xl border border-[#D4AF37]/20">
+                        <select className="bg-black text-[#D4AF37] border border-[#D4AF37]/30 p-2 rounded-lg" value={selectedSurah} onChange={e => setSelectedSurah(e.target.value)}>
+                            {surahs.map(s => <option key={s.number} value={s.number}>{s.name}</option>)}
+                        </select>
+                        <select className="bg-black text-[#D4AF37] border border-[#D4AF37]/30 p-2 rounded-lg" value={selectedReciter} onChange={e => setSelectedReciter(e.target.value)}>
+                            {RECITERS.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
+                        </select>
+                        <button onClick={toggle} className="bg-[#D4AF37] text-black px-8 py-2 rounded-lg font-bold hover:scale-105 transition-all">
+                            {isPlaying ? "إيقاف" : "تشغيل"}
+                        </button>
+                    </div>
+
+                    <div className="relative aspect-video bg-black rounded-3xl border-4 border-[#D4AF37]/30 overflow-hidden flex flex-col items-center justify-center p-8 shadow-2xl">
+                        <div className="absolute inset-0 bg-islamic-pattern opacity-5"></div>
+                        <audio ref={audioRef} src={activeVerse?.audio} onEnded={() => setIsPlaying(false)} />
+                        {activeVerse && (
+                            <h1 className="font-amiri text-3xl md:text-5xl text-center leading-loose z-10 animate-verse">
+                                {activeVerse.text}
+                            </h1>
+                        )}
+                        <div className="absolute bottom-0 w-full h-10 bg-black/80 border-t border-[#D4AF37]/30 flex items-center overflow-hidden">
+                            <div className="animate-ticker whitespace-nowrap text-[#D4AF37] font-amiri text-lg">
+                                ✨ قناة نعيم الذاكرين - تلاوات خاشعة لراحة القلوب ✨
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
 
         function App() {
-            // ... (Copiez ici le corps de votre fonction App et les sous-composants)
+            const [uiLang, setUiLang] = useState('ar');
+            const [view, setView] = useState('home');
+
+            if (typeof UI_DICT === 'undefined') return <div className="min-h-screen bg-black flex items-center justify-center text-[#D4AF37]">جاري تهيئة البيانات...</div>;
+            
+            const t = UI_DICT[uiLang];
+
+            return (
+                <div className="min-h-screen flex flex-col font-cairo bg-[#000d0a]" dir="rtl">
+                    <nav className="bg-[#011a14] border-b border-[#D4AF37]/30 p-4 sticky top-0 z-[100] flex justify-between items-center shadow-xl">
+                        <div className="flex items-center gap-3">
+                            <span className="text-[#D4AF37] font-amiri text-2xl font-bold">نعيم الذاكرين</span>
+                        </div>
+                        <div className="flex gap-4">
+                            <button onClick={() => setView('home')} className={`px-4 py-1 rounded-full ${view==='home' ? 'bg-[#D4AF37] text-black font-bold':'text-white'}`}>{t.home}</button>
+                            <button onClick={() => setView('tv')} className={`px-4 py-1 rounded-full ${view==='tv' ? 'bg-[#D4AF37] text-black font-bold':'text-white'}`}>{t.quranPlayer}</button>
+                        </div>
+                    </nav>
+
+                    <main className="flex-1 max-w-6xl mx-auto w-full p-4 md:p-8">
+                        {view === 'home' ? <DashboardView uiLang={uiLang} t={t} /> : <QuranTVView uiLang={uiLang} t={t} />}
+                    </main>
+
+                    <footer className="p-8 text-center text-emerald-200/20 text-xs border-t border-[#D4AF37]/10">
+                        © {new Date().getFullYear()} نعيم الذاكرين - جميع الحقوق محفوظة
+                    </footer>
+                </div>
+            );
         }
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
