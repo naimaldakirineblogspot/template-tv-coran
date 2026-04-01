@@ -6,16 +6,11 @@
     <title>نعيم الذاكرين</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
-
     <link rel="stylesheet" href="./style.css">
 
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-    <script>
-        window.exports = window;
-    </script>
 </head>
 <body class="bg-black text-white selection:bg-[#D4AF37]">
 
@@ -144,6 +139,7 @@
             const [uiLang, setUiLang] = useState('ar');
             const [view, setView] = useState('home');
 
+            // C'est ici que ça bloquait : UI_DICT était indéfini à cause de l'erreur dans data.js
             if (typeof UI_DICT === 'undefined') return <div className="min-h-screen bg-black flex items-center justify-center text-[#D4AF37]">جاري تهيئة البيانات...</div>;
             
             const t = UI_DICT[uiLang];
